@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 180" role="img" aria-labelledby="title">
+  <title id="title">Student Loan Repayment Plan Estimator logo</title>
+  <defs>
+    <linearGradient id="horizon" x1="24" y1="132" x2="164" y2="42" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5bc8ff"/>
+      <stop offset="0.42" stop-color="#ff76c7"/>
+      <stop offset="1" stop-color="#ffe782"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#glow)">
+    <path d="M24 132c31-52 78-78 140-84v84H24Z" fill="url(#horizon)" opacity="0.92"/>
+    <path d="M24 132c35-34 78-56 140-66" fill="none" stroke="#ffb15c" stroke-width="9" stroke-linecap="round" opacity="0.72"/>
+    <path d="M36 114 72 92l28-28 40-26" fill="none" stroke="#13203f" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="36" cy="114" r="13" fill="#9be3ff" stroke="#13203f" stroke-width="6"/>
+    <circle cx="72" cy="92" r="13" fill="#ff9ed6" stroke="#13203f" stroke-width="6"/>
+    <circle cx="100" cy="64" r="13" fill="#ffe782" stroke="#13203f" stroke-width="6"/>
+    <circle cx="140" cy="38" r="13" fill="#ffb15c" stroke="#13203f" stroke-width="6"/>
+  </g>
+  <text x="204" y="78" fill="#13203f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="42" font-weight="850" letter-spacing="-1.4">Student Loan</text>
+  <text x="204" y="124" fill="#13203f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="42" font-weight="850" letter-spacing="-1.4">Repayment Plan Estimator</text>
+</svg>
