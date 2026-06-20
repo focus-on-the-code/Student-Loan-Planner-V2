@@ -1,4 +1,4 @@
-import { sourceId } from '$lib/domain/types';
+import { sourceId } from '$lib/domain';
 import type { SourceRecord } from '$lib/rules/types';
 
 export const SOURCE_RETRIEVED_ON = '2026-06-20';
