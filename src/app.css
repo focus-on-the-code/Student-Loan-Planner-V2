@@ -1,0 +1,220 @@
+@import '$lib/styles/tokens.css';
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--gradient-page);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+}
+
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(116, 96, 255, 0.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(116, 96, 255, 0.11) 1px, transparent 1px);
+  background-size: 54px 54px;
+  content: '';
+  mask-image: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.18),
+    rgba(0, 0, 0, 0.02) 70%
+  );
+  pointer-events: none;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-pink);
+  outline-offset: 3px;
+}
+
+.page-shell {
+  width: min(100% - 2rem, var(--content-max));
+  margin: 0 auto;
+  padding: var(--space-6) 0 var(--space-12);
+}
+
+.glass-card {
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.93),
+    rgba(255, 255, 255, 0.72)
+  );
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+}
+
+.hero-card {
+  display: grid;
+  gap: var(--space-8);
+  padding: clamp(2rem, 6vw, 4rem);
+  overflow: hidden;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(18rem, 0.6fr);
+  gap: var(--space-8);
+  align-items: center;
+}
+
+.eyebrow,
+.pill {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(46, 140, 255, 0.15);
+  border-radius: var(--radius-pill);
+  background: var(--gradient-chip);
+  color: #2a3f6d;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  max-width: 12ch;
+  margin-bottom: var(--space-3);
+  font-size: clamp(2.5rem, 8vw, 5.25rem);
+  letter-spacing: -0.06em;
+  line-height: 0.96;
+}
+
+h2 {
+  margin-bottom: var(--space-3);
+  font-size: clamp(1.65rem, 4vw, 2.5rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.lead {
+  max-width: 68ch;
+  color: var(--color-ink-soft);
+  font-size: clamp(1rem, 2vw, 1.12rem);
+  line-height: 1.7;
+}
+
+.tagline {
+  margin-bottom: var(--space-4);
+  color: #17315f;
+  font-size: clamp(1.25rem, 3vw, 1.8rem);
+  font-weight: 850;
+}
+
+.action-row,
+.card-grid,
+.nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.button-link,
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #17315f;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.button-link.primary {
+  border-color: transparent;
+  background: var(--gradient-action);
+  box-shadow: 0 10px 28px rgba(255, 175, 92, 0.28);
+}
+
+.info-card {
+  flex: 1 1 12rem;
+  min-height: 9rem;
+  padding: var(--space-5);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-strong);
+  box-shadow: var(--shadow-soft);
+}
+
+.info-card strong {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--color-ink);
+  font-size: 1.25rem;
+}
+
+.info-card span {
+  color: var(--color-ink-soft);
+  line-height: 1.55;
+}
+
+.logo-panel {
+  display: grid;
+  place-items: center;
+  min-height: 18rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(
+      circle at 30% 30%,
+      rgba(255, 231, 130, 0.55),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 65% 60%,
+      rgba(91, 200, 255, 0.36),
+      transparent 32%
+    ),
+    rgba(255, 255, 255, 0.58);
+}
+
+.support-card {
+  display: grid;
+  gap: var(--space-4);
+  padding: clamp(2rem, 6vw, 4rem);
+}
+
+@media (max-width: 760px) {
+  .page-shell {
+    width: min(100% - 1rem, var(--content-max));
+    padding-top: var(--space-3);
+  }
+
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .logo-panel {
+    min-height: 12rem;
+  }
+}
