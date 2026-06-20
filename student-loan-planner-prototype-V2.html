@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Loan Repayment Planner Prototype</title>
+  <style>
+    :root {
+      --bg-1: #f8fbff;
+      --bg-2: #eef2ff;
+      --surface: rgba(255,255,255,0.78);
+      --surface-strong: rgba(255,255,255,0.92);
+      --text: #13203f;
+      --muted: #1a1f2b;
+      --line: rgba(25,42,89,0.16);
+      --shadow: 0 24px 60px rgba(61, 84, 138, 0.18);
+      --blue: #5bc8ff;
+      --blue-strong: #2e8cff;
+      --pink: #ff76c7;
+      --pink-strong: #df3ea0;
+      --orange: #ffb15c;
+      --yellow: #ffe782;
+      --mint: #8ff4d6;
+      --purple: #8f73ff;
+      --success: #1a8e66;
+      --danger: #b43b63;
+      --warning: #9e6700;
+      --glow-1: rgba(91, 200, 255, 0.28);
+      --glow-2: rgba(255, 118, 199, 0.22);
+      --glow-3: rgba(255, 177, 92, 0.22);
+      --grid: rgba(116, 96, 255, 0.11);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 20%, var(--glow-1), transparent 24%),
+        radial-gradient(circle at 88% 18%, var(--glow-2), transparent 28%),
+        radial-gradient(circle at 75% 75%, var(--glow-3), transparent 26%),
+        linear-gradient(180deg, #fcfeff 0%, #f5f3ff 38%, #fff9f2 100%);
+      position: relative;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 54px 54px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.02) 70%);
+      z-index: 0;
+    }
+    .sun {
+      position: fixed;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      right: -130px;
+      top: -120px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.88) 0, rgba(255,255,255,.4) 11%, rgba(255,126,186,.58) 11.5%, rgba(255,126,186,.58) 21%, rgba(255,214,128,.8) 21.5%, rgba(255,214,128,.8) 31%, rgba(100,220,255,.72) 31.5%, rgba(100,220,255,.72) 41%, rgba(255,255,255,.75) 41.5%, rgba(255,255,255,.75) 100%);
+      opacity: .66;
+      filter: blur(2px);
+      box-shadow: 0 0 80px rgba(255,133,197,.25);
+      z-index: 0;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(255,255,255,.93), rgba(255,255,255,.72));
+      border: 1px solid rgba(255,255,255,.7);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      border-radius: 28px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -12% -45% auto;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(91,200,255,.35), transparent 65%);
+      pointer-events: none;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, rgba(91,200,255,.24), rgba(255,118,199,.18));
+      border: 1px solid rgba(46,140,255,.15);
+      color: #2a3f6d;
+    }
+    .hero h1 {
+      margin: 16px 0 12px;
+      font-size: clamp(2rem, 4vw, 3.65rem);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+      max-width: 11ch;
+    }
+    .hero p.lead {
+      margin: 0;
+      max-width: 70ch;
+      color: #1a1f2b;
+      line-height: 1.6;
+      font-size: 1.02rem;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 2.2fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    .stat-ribbon {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 22px;
+    }
+    .mini-stat {
+      background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.62));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      min-height: 112px;
+      box-shadow: 0 16px 28px rgba(33,52,111,.08);
+    }
+    .mini-stat .label { font-size: 0.82rem; color: #1a1f2b; font-weight: 600; }
+    .mini-stat .value { font-size: 1.45rem; font-weight: 800; margin-top: 10px; }
+    .mini-stat .sub { margin-top: 8px; color: #1a1f2b; font-size: .88rem; line-height: 1.4; }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+    }
+
+    .button, button, .file-link {
+      appearance: none;
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font: inherit;
+      cursor: pointer;
+      transition: transform .16s ease, box-shadow .16s ease, opacity .16s ease, background .16s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .button:hover, button:hover, .file-link:hover { transform: translateY(-1px); }
+    .btn-primary {
+      color: #16264f;
+      background: linear-gradient(135deg, var(--yellow), #ffd17f 55%, #ffc497);
+      box-shadow: 0 10px 28px rgba(255,175,92,.28);
+      font-weight: 800;
+    }
+    .btn-secondary {
+      color: #17315f;
+      background: linear-gradient(135deg, #ffffff, #eef6ff);
+      border: 1px solid rgba(46,140,255,.15);
+      box-shadow: 0 8px 22px rgba(51,70,138,.10);
+      font-weight: 700;
+    }
+    .btn-tertiary {
+      color: #17315f;
+      background: linear-gradient(135deg, rgba(91,200,255,.18), rgba(255,118,199,.16));
+      border: 1px solid rgba(46,140,255,.12);
+      font-weight: 700;
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, #ffd6e7, #ffe9f2);
+      color: #7b1f49;
+      border: 1px solid rgba(180,59,99,.18);
+      font-weight: 700;
+    }
+
+    .hidden { display: none !important; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 18px;
+      margin-top: 20px;
+      align-items: start;
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,.78);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      border-radius: 24px;
+      padding: 22px;
+    }
+    .panel h2, .panel h3 {
+      margin: 0 0 10px;
+      letter-spacing: -0.02em;
+    }
+    .panel p.note, .muted { color: #1a1f2b; }
+
+    .sidebar {
+      position: sticky;
+      top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: calc(100vh - 36px);
+      overflow: auto;
+      padding-right: 4px;
+    }
+    .sidebar::-webkit-scrollbar { width: 8px; }
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(137,120,255,.25);
+      border-radius: 999px;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+    .section-label .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: rgba(91,200,255,.15);
+      font-size: 12px;
+      font-weight: 700;
+      color: #28537a;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .field.full { grid-column: 1 / -1; }
+    .field label {
+      font-size: .9rem;
+      font-weight: 700;
+      color: #23365f;
+    }
+    .field small {
+      color: #1a1f2b;
+      font-size: .78rem;
+      line-height: 1.35;
+    }
+    input, select, textarea {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(36,57,111,.14);
+      background: rgba(255,255,255,.92);
+      color: var(--text);
+      padding: 12px 12px;
+      font: inherit;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 4px 12px rgba(70,88,140,.04);
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: 3px solid rgba(91,200,255,.22);
+      border-color: rgba(46,140,255,.45);
+    }
+    input[type="range"] {
+      padding: 0;
+      box-shadow: none;
+      accent-color: var(--pink-strong);
+      background: transparent;
+    }
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .range-row output {
+      min-width: 58px;
+      text-align: right;
+      font-weight: 800;
+      color: #263f6f;
+    }
+    .radio-row, .check-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .choice {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.8);
+      border: 1px solid rgba(36,57,111,.12);
+      cursor: pointer;
+      color: #20345e;
+      font-weight: 700;
+      font-size: .92rem;
+    }
+    .choice input { width: auto; margin: 0; }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .main {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .scenario-banner {
+      display: flex;
+      gap: 14px;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      background: linear-gradient(120deg, rgba(255,255,255,.85), rgba(255,245,249,.8));
+      border: 1px solid rgba(255,255,255,.8);
+      border-radius: 22px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+    .scenario-title h2 { margin: 0; font-size: 1.4rem; }
+    .pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(91,200,255,.12);
+      color: #28466d;
+      font-size: .85rem;
+      font-weight: 700;
+    }
+    .status-pill.success { background: rgba(31,163,120,.15); color: var(--success); }
+    .status-pill.warn { background: rgba(255,179,79,.16); color: var(--warning); }
+    .status-pill.danger { background: rgba(180,59,99,.14); color: var(--danger); }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 14px;
+    }
+    .summary-card {
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.8);
+      box-shadow: 0 12px 26px rgba(45,61,118,.1);
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.7));
+      min-height: 145px;
+    }
+    .summary-card .headline {
+      font-size: .82rem;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      font-weight: 800;
+      color: #171b24;
+    }
+    .summary-card .metric {
+      font-size: 1.7rem;
+      font-weight: 800;
+      margin: 12px 0 8px;
+      letter-spacing: -.03em;
+    }
+    .summary-card p { margin: 0; color: #1a1f2b; line-height: 1.45; }
+    .accent-blue { box-shadow: 0 16px 32px rgba(91,200,255,.2); }
+    .accent-pink { box-shadow: 0 16px 32px rgba(255,118,199,.18); }
+    .accent-yellow { box-shadow: 0 16px 32px rgba(255,210,104,.18); }
+    .accent-purple { box-shadow: 0 16px 32px rgba(143,115,255,.16); }
+
+    .table-shell {
+      overflow: auto;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.82);
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.82));
+      box-shadow: var(--shadow);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 960px;
+    }
+    th, td {
+      padding: 14px 14px;
+      border-bottom: 1px solid rgba(25,42,89,.08);
+      vertical-align: top;
+      text-align: left;
+    }
+    th {
+      background: linear-gradient(180deg, rgba(91,200,255,.12), rgba(255,118,199,.08));
+      font-size: .82rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #3a507b;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tbody tr:hover { background: rgba(91,200,255,.06); }
+    .plan-name { font-weight: 800; }
+    .eligibility {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-weight: 800;
+      font-size: .78rem;
+      letter-spacing: .03em;
+      white-space: nowrap;
+    }
+    .eligibility.eligible { background: rgba(31,163,120,.15); color: var(--success); }
+    .eligibility.maybe { background: rgba(255,179,79,.18); color: var(--warning); }
+    .eligibility.no { background: rgba(180,59,99,.14); color: var(--danger); }
+    .tiny { font-size: .79rem; color: #1a1f2b; line-height: 1.4; }
+    .value-strong { font-weight: 800; }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 16px;
+    }
+    .plan-card {
+      border-radius: 24px;
+      padding: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.74));
+      border: 1px solid rgba(255,255,255,.82);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .plan-card.ineligible { opacity: .72; }
+    .plan-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .plan-header h3 { margin: 0 0 6px; }
+    .subgrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+    }
+    .metric-block {
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(245,249,255,.85);
+      border: 1px solid rgba(36,57,111,.08);
+    }
+    .metric-block .label { color: #1a1f2b; font-size: .82rem; font-weight: 700; }
+    .metric-block .figure { font-weight: 800; font-size: 1.15rem; margin-top: 8px; }
+    .benefits, .risks {
+      padding-left: 18px;
+      margin: 0;
+      color: #27406f;
+    }
+    .benefits li, .risks li { margin-bottom: 8px; line-height: 1.45; }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 16px;
+    }
+    .chart-card {
+      border-radius: 24px;
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.78));
+      border: 1px solid rgba(255,255,255,.82);
+      box-shadow: var(--shadow);
+      min-height: 430px;
+    }
+    .chart-card canvas { width: 100%; height: 340px; display: block; }
+    .chart-meta {
+      color: #1a1f2b;
+      font-size: .88rem;
+      line-height: 1.45;
+      margin-top: 10px;
+    }
+
+    .disclaimer {
+      padding: 18px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,247,237,.88), rgba(255,255,255,.78));
+      border: 1px solid rgba(255,181,92,.28);
+      color: #523912;
+      line-height: 1.55;
+      box-shadow: 0 10px 24px rgba(255,177,92,.12);
+    }
+
+    .onboarding {
+      margin-top: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.76));
+      border-radius: 24px;
+      padding: 22px;
+      border: 1px solid rgba(255,255,255,.82);
+      box-shadow: var(--shadow);
+    }
+    .steps {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .step {
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: rgba(91,200,255,.1);
+      color: #31517a;
+      font-weight: 800;
+      font-size: .88rem;
+      border: 1px solid rgba(91,200,255,.12);
+    }
+    .step.active {
+      background: linear-gradient(90deg, rgba(255,231,130,.66), rgba(255,118,199,.22));
+      color: #40321a;
+      border-color: rgba(255,177,92,.18);
+    }
+    .step.completed {
+      background: rgba(143,244,214,.18);
+      color: #1c6b54;
+    }
+
+    .wizard-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .loan-table {
+      width: 100%;
+      min-width: auto;
+    }
+    .loan-table th, .loan-table td { padding: 10px 10px; }
+    .loan-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .flash {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(21,37,86,.95), rgba(54,72,145,.92));
+      color: white;
+      box-shadow: 0 18px 40px rgba(21,37,86,.35);
+      max-width: 320px;
+      opacity: 0;
+      transform: translateY(14px);
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 10;
+    }
+    .flash.show { opacity: 1; transform: translateY(0); }
+
+    .mobile-toggle {
+      display: none;
+      position: sticky;
+      bottom: 10px;
+      z-index: 5;
+      margin-top: 10px;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(17,24,51,.42);
+      backdrop-filter: blur(4px);
+      display: none;
+      z-index: 7;
+    }
+    .overlay.show { display: block; }
+
+
+    .chart-wrap { position: relative; }
+    .chart-tooltip {
+      position: absolute;
+      min-width: 180px;
+      max-width: 240px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(17,19,24,.96);
+      color: #fff;
+      font-size: .84rem;
+      line-height: 1.4;
+      box-shadow: 0 14px 34px rgba(17,19,24,.28);
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, calc(-100% - 12px));
+      transition: opacity .14s ease;
+      z-index: 3;
+    }
+    .chart-tooltip.show { opacity: 1; }
+    .th-wrap { display: inline-flex; align-items: center; gap: 6px; }
+    .info-btn {
+      width: 20px; height: 20px; border-radius: 50%; padding: 0;
+      background: rgba(46,140,255,.14); color: #111318;
+      border: 1px solid rgba(46,140,255,.28); font-size: 12px; font-weight: 900;
+      position: relative;
+    }
+    .info-btn::after {
+      content: attr(data-tip);
+      position: absolute;
+      left: 50%; bottom: calc(100% + 10px);
+      transform: translateX(-50%);
+      width: 210px;
+      background: rgba(17,19,24,.97); color: white;
+      padding: 9px 10px; border-radius: 10px;
+      font-size: 12px; line-height: 1.35; text-transform: none; letter-spacing: 0;
+      box-shadow: 0 12px 28px rgba(17,19,24,.25);
+      opacity: 0; pointer-events: none; z-index: 20;
+      transition: opacity .14s ease;
+    }
+    .info-btn:hover::after, .info-btn:focus::after, .info-btn.open::after { opacity: 1; }
+    .comparison-actions { display:flex; justify-content:flex-end; margin-top:14px; }
+
+    .footer-note {
+      text-align: center;
+      color: #1a1f2b;
+      font-size: .9rem;
+      margin-top: 28px;
+    }
+
+    @media (max-width: 1180px) {
+      .workspace { grid-template-columns: 320px minmax(0,1fr); }
+      .summary-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .cards-grid, .chart-grid, .hero-grid { grid-template-columns: 1fr; }
+      .stat-ribbon { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 920px) {
+      .workspace { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        max-height: 86vh;
+        overflow: auto;
+        transform: translateY(103%);
+        transition: transform .25s ease;
+        border-radius: 24px 24px 0 0;
+        z-index: 8;
+        padding: 16px 16px 100px;
+        background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,248,252,.96));
+      }
+      .sidebar.open { transform: translateY(0); }
+      .mobile-toggle { display: block; }
+      .main { gap: 14px; }
+      .field-grid, .subgrid, .summary-grid, .cards-grid, .chart-grid, .stat-ribbon { grid-template-columns: 1fr; }
+      .hero { padding: 22px; }
+      .panel, .onboarding { padding: 18px; }
+      .scenario-banner { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sun" aria-hidden="true"></div>
+  <div class="overlay" id="overlay"></div>
+  <div class="flash" id="flash"></div>
+  <div class="app">
+    <header class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">⚡ Prototype · Live repayment comparison workspace</div>
+          <h1>Student Loan Repayment Planner</h1>
+          <p class="lead">
+            A high-clarity prototype for comparing federal student loan repayment plans. Enter your scenario,
+            review estimated payments and timelines, and adjust inputs live without restarting the workflow.
+            This demo is designed for decision support and explanation, not final legal or servicer determinations.
+          </p>
+          <div class="top-actions">
+            <button class="btn-primary" id="startWizardBtn">Start guided setup</button>
+            <button class="btn-secondary" id="jumpToResultsBtn">Use quick-start sample</button>
+            <button class="btn-tertiary" id="downloadJsonBtn">Export scenario JSON</button>
+          </div>
+        </div>
+        <div>
+          <div class="stat-ribbon">
+            <div class="mini-stat">
+              <div class="label">Live editing</div>
+              <div class="value">Instant updates</div>
+              <div class="sub">Change income, filing status, dependents, or growth assumptions right from the results view.</div>
+            </div>
+            <div class="mini-stat">
+              <div class="label">Prototype plans</div>
+              <div class="value">RAP · IBR · Tiered</div>
+              <div class="sub">Includes summary logic for legacy PAYE and ICR for comparison and messaging.</div>
+            </div>
+            <div class="mini-stat">
+              <div class="label">Design tone</div>
+              <div class="value">Light vaporwave</div>
+              <div class="sub">High-contrast 80s pastel palette with blues, yellows, pinks, and oranges.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="onboarding" id="onboardingSection">
+      <div class="section-label">
+        <div>
+          <h2>Guided setup</h2>
+          <p class="note">Start here once, then use the live scenario editor in results to make updates without stepping backward.</p>
+        </div>
+        <span class="chip">Step-by-step onboarding</span>
+      </div>
+      <div class="steps" id="steps"></div>
+      <form id="wizardForm">
+        <div class="wizard-step" data-step="0">
+          <div class="field-grid">
+            <div class="field">
+              <label for="wScenarioName">Scenario name</label>
+              <input id="wScenarioName" type="text" placeholder="Example: Current plan estimate" />
+              <small>Used in the results header and saved scenario export.</small>
+            </div>
+            <div class="field">
+              <label for="wCurrentPlan">Current plan</label>
+              <select id="wCurrentPlan">
+                <option value="RAP">RAP</option>
+                <option value="IBR">IBR</option>
+                <option value="TIERED">Tiered Standard</option>
+                <option value="PAYE">PAYE</option>
+                <option value="ICR">ICR</option>
+                <option value="STANDARD">Standard</option>
+                <option value="SAVE">SAVE / no longer available</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="wLoanBalance">Total student loan balance</label>
+              <input id="wLoanBalance" type="number" min="0" step="100" placeholder="55000" />
+            </div>
+            <div class="field">
+              <label for="wInterestRate">Average interest rate</label>
+              <input id="wInterestRate" type="number" min="0" max="15" step="0.01" placeholder="6.8" />
+            </div>
+            <div class="field">
+              <label for="wLoanProgram">Loan program</label>
+              <select id="wLoanProgram">
+                <option value="DIRECT">Direct</option>
+                <option value="FFEL">FFEL</option>
+                <option value="PERKINS">Perkins</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="wLoanType">Loan type detail</label>
+              <select id="wLoanType">
+                <option value="UNDERGRAD">Direct Subsidized / Unsubsidized</option>
+                <option value="GRAD_PLUS">Graduate PLUS</option>
+                <option value="PARENT_PLUS">Parent PLUS</option>
+                <option value="CONSOLIDATION">Consolidation</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="wizard-step hidden" data-step="1">
+          <div class="field-grid">
+            <div class="field">
+              <label for="wDisbursementCohort">Did you receive a Direct Loan on or after July 1, 2026?</label>
+              <select id="wDisbursementCohort">
+                <option value="pre">No, all loans are before July 1, 2026</option>
+                <option value="post">Yes, at least one Direct Loan is on or after July 1, 2026</option>
+                <option value="mixed">Mixed or not sure</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="wConsolidated">Have you consolidated?</label>
+              <select id="wConsolidated">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="wParentPlusHistory">Does Parent PLUS appear in your loan history?</label>
+              <select id="wParentPlusHistory">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="wIdrMonths">Existing IDR forgiveness credit (months)</label>
+              <input id="wIdrMonths" type="number" min="0" max="360" step="1" placeholder="0" />
+            </div>
+            <div class="field">
+              <label for="wPslfMonths">Existing PSLF credit (months)</label>
+              <input id="wPslfMonths" type="number" min="0" max="120" step="1" placeholder="0" />
+            </div>
+            <div class="field">
+              <label for="wPublicService">Are you in public service?</label>
+              <select id="wPublicService">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="wizard-step hidden" data-step="2">
+          <div class="field-grid">
+            <div class="field">
+              <label for="wAgi">Current AGI</label>
+              <input id="wAgi" type="number" min="0" step="100" placeholder="65000" />
+            </div>
+            <div class="field">
+              <label for="wIncomeGrowth">Expected annual income growth</label>
+              <input id="wIncomeGrowth" type="number" min="0" max="15" step="0.1" placeholder="3" />
+            </div>
+            <div class="field">
+              <label for="wFamilySize">Family size</label>
+              <input id="wFamilySize" type="number" min="1" max="12" step="1" placeholder="1" />
+            </div>
+            <div class="field">
+              <label for="wRapDependents">RAP dependents claimed</label>
+              <input id="wRapDependents" type="number" min="0" max="10" step="1" placeholder="0" />
+            </div>
+            <div class="field">
+              <label for="wFilingStatus">Tax filing status</label>
+              <select id="wFilingStatus">
+                <option value="single">Single</option>
+                <option value="mfj">Married filing jointly</option>
+                <option value="mfs">Married filing separately</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="wSpouseIncome">Spouse AGI</label>
+              <input id="wSpouseIncome" type="number" min="0" step="100" placeholder="0" />
+            </div>
+            <div class="field">
+              <label for="wSpouseDebt">Spouse eligible student debt</label>
+              <input id="wSpouseDebt" type="number" min="0" step="100" placeholder="0" />
+            </div>
+            <div class="field">
+              <label for="wForgivenessTaxRate">Forgiveness tax assumption</label>
+              <input id="wForgivenessTaxRate" type="number" min="0" max="50" step="0.5" placeholder="25" />
+            </div>
+          </div>
+        </div>
+        <div class="wizard-nav">
+          <button type="button" class="btn-secondary" id="backStepBtn">Back</button>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="btn-secondary" id="fillDemoBtn">Fill sample values</button>
+            <button type="button" class="btn-primary" id="nextStepBtn">Next</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <div class="workspace hidden" id="workspace">
+      <aside class="sidebar panel" id="sidebar">
+        <div class="section-label">
+          <div>
+            <h2>Your scenario</h2>
+            <p class="note">Edit here anytime. Results refresh live.</p>
+          </div>
+          <span class="chip">Live editor</span>
+        </div>
+
+        <div>
+          <div class="section-label"><h3>Quick adjustments</h3><span class="chip">High impact</span></div>
+          <div class="field-grid">
+            <div class="field full">
+              <label for="sScenarioName">Scenario name</label>
+              <input id="sScenarioName" type="text" />
+            </div>
+            <div class="field">
+              <label for="sAgi">Current AGI</label>
+              <input id="sAgi" type="number" min="0" step="100" />
+            </div>
+            <div class="field">
+              <label for="sLoanBalance">Loan balance</label>
+              <input id="sLoanBalance" type="number" min="0" step="100" />
+            </div>
+            <div class="field full">
+              <label for="sIncomeGrowth">Income growth</label>
+              <div class="range-row">
+                <input id="sIncomeGrowth" type="range" min="0" max="10" step="0.1" />
+                <output id="sIncomeGrowthOut">0%</output>
+              </div>
+            </div>
+            <div class="field">
+              <label for="sFamilySize">Family size</label>
+              <input id="sFamilySize" type="number" min="1" max="12" step="1" />
+            </div>
+            <div class="field">
+              <label for="sRapDependents">RAP dependents</label>
+              <input id="sRapDependents" type="number" min="0" max="10" step="1" />
+            </div>
+            <div class="field">
+              <label for="sFilingStatus">Filing status</label>
+              <select id="sFilingStatus">
+                <option value="single">Single</option>
+                <option value="mfj">Married filing jointly</option>
+                <option value="mfs">Married filing separately</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="sSpouseIncome">Spouse AGI</label>
+              <input id="sSpouseIncome" type="number" min="0" step="100" />
+            </div>
+            <div class="field">
+              <label for="sPublicService">Public service</label>
+              <select id="sPublicService">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="sCurrentPlan">Current plan</label>
+              <select id="sCurrentPlan">
+                <option value="RAP">RAP</option>
+                <option value="IBR">IBR</option>
+                <option value="TIERED">Tiered Standard</option>
+                <option value="PAYE">PAYE</option>
+                <option value="ICR">ICR</option>
+                <option value="STANDARD">Standard</option>
+                <option value="SAVE">SAVE / no longer available</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-label"><h3>Eligibility details</h3><span class="chip">Plan rules</span></div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="sLoanProgram">Loan program</label>
+              <select id="sLoanProgram">
+                <option value="DIRECT">Direct</option>
+                <option value="FFEL">FFEL</option>
+                <option value="PERKINS">Perkins</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="sLoanType">Loan type</label>
+              <select id="sLoanType">
+                <option value="UNDERGRAD">Direct Subsidized / Unsubsidized</option>
+                <option value="GRAD_PLUS">Graduate PLUS</option>
+                <option value="PARENT_PLUS">Parent PLUS</option>
+                <option value="CONSOLIDATION">Consolidation</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="sDisbursementCohort">Post-July 2026 Direct Loan?</label>
+              <select id="sDisbursementCohort">
+                <option value="pre">No</option>
+                <option value="post">Yes</option>
+                <option value="mixed">Mixed or not sure</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="sConsolidated">Consolidated?</label>
+              <select id="sConsolidated">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="sParentPlusHistory">Parent PLUS history?</label>
+              <select id="sParentPlusHistory">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="sInterestRate">Interest rate</label>
+              <input id="sInterestRate" type="number" min="0" max="15" step="0.01" />
+            </div>
+            <div class="field">
+              <label for="sIdrMonths">Existing IDR months</label>
+              <input id="sIdrMonths" type="number" min="0" max="360" step="1" />
+            </div>
+            <div class="field">
+              <label for="sPslfMonths">Existing PSLF months</label>
+              <input id="sPslfMonths" type="number" min="0" max="120" step="1" />
+            </div>
+            <div class="field">
+              <label for="sForgivenessTaxRate">Forgiveness tax rate</label>
+              <input id="sForgivenessTaxRate" type="number" min="0" max="50" step="0.5" />
+            </div>
+            <div class="field">
+              <label for="sSpouseDebt">Spouse student debt</label>
+              <input id="sSpouseDebt" type="number" min="0" step="100" />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-label"><h3>Scenario tools</h3><span class="chip">Control</span></div>
+          <div class="toolbar">
+            <button class="btn-secondary" id="saveLocalBtn" type="button">Save to browser</button>
+            <button class="btn-secondary" id="loadLocalBtn" type="button">Load saved</button>
+            <button class="btn-secondary" id="exportHtmlBtn" type="button">Print results</button>
+            <button class="btn-danger" id="resetScenarioBtn" type="button">Reset scenario</button>
+          </div>
+          <p class="tiny" style="margin-top:12px;">Prototype note: this single-file demo keeps calculations in your browser only.</p>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="mobile-toggle">
+          <button class="btn-primary" id="toggleSidebarBtn" type="button">Adjust scenario</button>
+        </div>
+
+        <section class="scenario-banner">
+          <div class="scenario-title">
+            <h2 id="scenarioTitle">Scenario results</h2>
+            <div class="pill-row" id="scenarioPills"></div>
+          </div>
+          <div class="pill-row">
+            <span class="pill">Rules version: 2026-07 prototype</span>
+            <span class="pill">Estimate date: <span id="estimateDate"></span></span>
+            <span class="pill">Updated: <span id="updatedTime"></span></span>
+          </div>
+        </section>
+
+        <section class="summary-grid" id="summaryGrid"></section>
+
+        <section class="panel">
+          <div class="section-label">
+            <div>
+              <h2>Plan comparison</h2>
+              <p class="note">Monthly, annual, total paid, payoff or forgiveness timing, and quick tradeoff notes.</p>
+            </div>
+            <span class="chip">At-a-glance</span>
+          </div>
+          <div class="table-shell">
+            <table aria-label="Repayment plan comparison">
+              <thead>
+                <tr>
+                  <th><span class="th-wrap">Plan <button class="info-btn" type="button" data-tip="The repayment option being compared." aria-label="About Plan">i</button></span></th>
+                  <th><span class="th-wrap">Eligibility <button class="info-btn" type="button" data-tip="Whether this plan appears available based on the information entered." aria-label="About Eligibility">i</button></span></th>
+                  <th><span class="th-wrap">Monthly now <button class="info-btn" type="button" data-tip="Your estimated required payment each month based on today’s inputs." aria-label="About Monthly now">i</button></span></th>
+                  <th><span class="th-wrap">Annual now <button class="info-btn" type="button" data-tip="Your estimated total required payments during the first year." aria-label="About Annual now">i</button></span></th>
+                  <th><span class="th-wrap">Year 5 monthly <button class="info-btn" type="button" data-tip="The estimated monthly payment during the fifth repayment year." aria-label="About Year 5 monthly">i</button></span></th>
+                  <th><span class="th-wrap">Total paid <button class="info-btn" type="button" data-tip="All borrower payments projected through payoff or forgiveness." aria-label="About Total paid">i</button></span></th>
+                  <th><span class="th-wrap">Est. forgiveness <button class="info-btn" type="button" data-tip="The projected balance canceled at the end of the plan, if any." aria-label="About Estimated forgiveness">i</button></span></th>
+                  <th><span class="th-wrap">Forgiveness tax <button class="info-btn" type="button" data-tip="Estimated tax associated with a projected forgiven balance." aria-label="About Forgiveness tax">i</button></span></th>
+                  <th><span class="th-wrap">Timeline <button class="info-btn" type="button" data-tip="The projected time until payoff or forgiveness." aria-label="About Timeline">i</button></span></th>
+                  <th><span class="th-wrap">Key notes <button class="info-btn" type="button" data-tip="Important benefits, limits, or eligibility caveats for the plan." aria-label="About Key notes">i</button></span></th>
+                </tr>
+              </thead>
+              <tbody id="comparisonBody"></tbody>
+            </table>
+          </div>
+          <div class="comparison-actions"><button class="btn-secondary" id="toggleAllPlansBtn" type="button">Show all plans</button></div>
+        </section>
+
+        <section class="chart-grid">
+          <div class="chart-card">
+            <div class="section-label">
+              <div>
+                <h3>Annual payment path</h3>
+                <p class="note">Estimated annual required payment by year.</p>
+              </div>
+              <span class="chip">Chart</span>
+            </div>
+            <div class="chart-wrap"><canvas id="paymentChart" width="980" height="420" tabindex="0" aria-label="Annual payment path chart"></canvas><div class="chart-tooltip" id="paymentTooltip" role="status" aria-live="polite"></div></div>
+            <div class="chart-meta">Shows how required payments may change under each eligible or shown-for-comparison plan using the current income growth assumption.</div>
+          </div>
+          <div class="chart-card">
+            <div class="section-label">
+              <div>
+                <h3>Remaining balance path</h3>
+                <p class="note">Projected balance after each year.</p>
+              </div>
+              <span class="chip">Chart</span>
+            </div>
+            <div class="chart-wrap"><canvas id="balanceChart" width="980" height="420" tabindex="0" aria-label="Remaining balance path chart"></canvas><div class="chart-tooltip" id="balanceTooltip" role="status" aria-live="polite"></div></div>
+            <div class="chart-meta">Helpful for visualizing fixed repayment, income-driven balance behavior, and RAP’s interest/proincipal support effects.</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-label">
+            <div>
+              <h2>Plan details</h2>
+              <p class="note">Expanded cost, timeline, benefits, and tradeoff summaries for each plan.</p>
+            </div>
+            <span class="chip">Decision support</span>
+          </div>
+          <div class="cards-grid" id="planCards"></div>
+        </section>
+
+        <section class="disclaimer">
+          <strong>Prototype limitations and disclosure:</strong>
+          This prototype uses a simplified browser-side simulation to help test interaction design and comparison structure.
+          It is not a substitute for official Federal Student Aid guidance, Department of Education regulations, or your loan servicer’s determination.
+          Eligibility for PAYE, ICR, RAP, IBR, and Parent PLUS transitions can depend on loan-level and historical facts not fully modeled here.
+          Use this prototype for layout, flow, and explanation testing, then replace the engine with a regulation-tested rules module before public release.
+        </section>
+      </main>
+    </div>
+
+    <p class="footer-note">Built as a self-contained single-file HTML prototype. No external libraries required.</p>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'student-loan-planner-prototype-scenario';
+    const colors = {
+      RAP: '#ff76c7',
+      IBR: '#2e8cff',
+      TIERED: '#ffb15c',
+      PAYE: '#8f73ff',
+      ICR: '#1f9ea0',
+      STANDARD: '#e9a900'
+    };
+
+    const povertyBase = 15960;
+    const povertyAdditional = 5680;
+
+    const defaultScenario = {
+      scenarioName: 'Sample borrower scenario',
+      currentPlan: 'IBR',
+      loanBalance: 55000,
+      interestRate: 6.8,
+      loanProgram: 'DIRECT',
+      loanType: 'UNDERGRAD',
+      disbursementCohort: 'pre',
+      consolidated: 'no',
+      parentPlusHistory: 'no',
+      idrMonths: 24,
+      pslfMonths: 24,
+      publicService: 'yes',
+      agi: 65000,
+      incomeGrowth: 3,
+      familySize: 1,
+      rapDependents: 0,
+      filingStatus: 'single',
+      spouseIncome: 0,
+      spouseDebt: 0,
+      forgivenessTaxRate: 25
+    };
+
+    let scenario = {...defaultScenario};
+    let currentStep = 0;
+    let lastResults = null;
+    let showAllPlans = false;
+    const chartHitMaps = new Map();
+    let debounceTimer = null;
+
+    const steps = [
+      { title: 'Loans', description: 'Balance, rate, and current plan' },
+      { title: 'Eligibility', description: 'Loan dates and program rules' },
+      { title: 'Household', description: 'Income, family, and tax assumptions' }
+    ];
+
+    const stepEls = [...document.querySelectorAll('.wizard-step')];
+    const stepsContainer = document.getElementById('steps');
+    const workspace = document.getElementById('workspace');
+    const onboardingSection = document.getElementById('onboardingSection');
+    const flash = document.getElementById('flash');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const estimateDateEl = document.getElementById('estimateDate');
+    const updatedTimeEl = document.getElementById('updatedTime');
+
+    function init() {
+      renderSteps();
+      wireWizard();
+      wireSidebar();
+      estimateDateEl.textContent = new Date().toLocaleDateString();
+      fillWizard(defaultScenario);
+      fillSidebar(defaultScenario);
+      setQuickStart();
+    }
+
+    function renderSteps() {
+      stepsContainer.innerHTML = '';
+      steps.forEach((step, idx) => {
+        const div = document.createElement('div');
+        const className = idx === currentStep ? 'step active' : idx < currentStep ? 'step completed' : 'step';
+        div.className = className;
+        div.textContent = `${idx + 1}. ${step.title}`;
+        stepsContainer.appendChild(div);
+      });
+      stepEls.forEach((el, idx) => el.classList.toggle('hidden', idx !== currentStep));
+      document.getElementById('backStepBtn').disabled = currentStep === 0;
+      document.getElementById('nextStepBtn').textContent = currentStep === stepEls.length - 1 ? 'Build results' : 'Next';
+    }
+
+    function wireWizard() {
+      document.getElementById('startWizardBtn').addEventListener('click', () => {
+        onboardingSection.scrollIntoView({behavior: 'smooth'});
+      });
+      document.getElementById('jumpToResultsBtn').addEventListener('click', () => {
+        scenario = {...defaultScenario};
+        fillSidebar(scenario);
+        showWorkspace();
+        calculateAndRender();
+        flashMessage('Loaded the sample scenario. Edit any input to see live updates.');
+      });
+      document.getElementById('fillDemoBtn').addEventListener('click', () => {
+        fillWizard(defaultScenario);
+        flashMessage('Filled sample onboarding values.');
+      });
+      document.getElementById('backStepBtn').addEventListener('click', () => {
+        if (currentStep > 0) {
+          currentStep -= 1;
+          renderSteps();
+        }
+      });
+      document.getElementById('nextStepBtn').addEventListener('click', () => {
+        if (currentStep < stepEls.length - 1) {
+          currentStep += 1;
+          renderSteps();
+        } else {
+          scenario = collectWizard();
+          fillSidebar(scenario);
+          showWorkspace();
+          calculateAndRender();
+          flashMessage('Scenario created. You can now change inputs live from the sidebar.');
+        }
+      });
+      document.getElementById('downloadJsonBtn').addEventListener('click', exportScenarioJson);
+      document.getElementById('toggleAllPlansBtn').addEventListener('click', () => {
+        showAllPlans = !showAllPlans;
+        renderComparison(lastResults);
+      });
+      document.querySelectorAll('.info-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          document.querySelectorAll('.info-btn.open').forEach(other => { if (other !== btn) other.classList.remove('open'); });
+          btn.classList.toggle('open');
+        });
+      });
+      document.addEventListener('click', () => document.querySelectorAll('.info-btn.open').forEach(btn => btn.classList.remove('open')));
+    }
+
+    function fillWizard(data) {
+      const map = {
+        wScenarioName: data.scenarioName,
+        wCurrentPlan: data.currentPlan,
+        wLoanBalance: data.loanBalance,
+        wInterestRate: data.interestRate,
+        wLoanProgram: data.loanProgram,
+        wLoanType: data.loanType,
+        wDisbursementCohort: data.disbursementCohort,
+        wConsolidated: data.consolidated,
+        wParentPlusHistory: data.parentPlusHistory,
+        wIdrMonths: data.idrMonths,
+        wPslfMonths: data.pslfMonths,
+        wPublicService: data.publicService,
+        wAgi: data.agi,
+        wIncomeGrowth: data.incomeGrowth,
+        wFamilySize: data.familySize,
+        wRapDependents: data.rapDependents,
+        wFilingStatus: data.filingStatus,
+        wSpouseIncome: data.spouseIncome,
+        wSpouseDebt: data.spouseDebt,
+        wForgivenessTaxRate: data.forgivenessTaxRate
+      };
+      Object.entries(map).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) el.value = value;
+      });
+    }
+
+    function collectWizard() {
+      return {
+        scenarioName: getVal('wScenarioName') || defaultScenario.scenarioName,
+        currentPlan: getVal('wCurrentPlan'),
+        loanBalance: num('wLoanBalance', defaultScenario.loanBalance),
+        interestRate: num('wInterestRate', defaultScenario.interestRate),
+        loanProgram: getVal('wLoanProgram'),
+        loanType: getVal('wLoanType'),
+        disbursementCohort: getVal('wDisbursementCohort'),
+        consolidated: getVal('wConsolidated'),
+        parentPlusHistory: getVal('wParentPlusHistory'),
+        idrMonths: num('wIdrMonths', defaultScenario.idrMonths),
+        pslfMonths: num('wPslfMonths', defaultScenario.pslfMonths),
+        publicService: getVal('wPublicService'),
+        agi: num('wAgi', defaultScenario.agi),
+        incomeGrowth: num('wIncomeGrowth', defaultScenario.incomeGrowth),
+        familySize: num('wFamilySize', defaultScenario.familySize),
+        rapDependents: num('wRapDependents', defaultScenario.rapDependents),
+        filingStatus: getVal('wFilingStatus'),
+        spouseIncome: num('wSpouseIncome', defaultScenario.spouseIncome),
+        spouseDebt: num('wSpouseDebt', defaultScenario.spouseDebt),
+        forgivenessTaxRate: num('wForgivenessTaxRate', defaultScenario.forgivenessTaxRate)
+      };
+    }
+
+    function wireSidebar() {
+      const ids = [
+        'sScenarioName','sAgi','sLoanBalance','sIncomeGrowth','sFamilySize','sRapDependents','sFilingStatus',
+        'sSpouseIncome','sPublicService','sCurrentPlan','sLoanProgram','sLoanType','sDisbursementCohort','sConsolidated',
+        'sParentPlusHistory','sInterestRate','sIdrMonths','sPslfMonths','sForgivenessTaxRate','sSpouseDebt'
+      ];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        const eventType = el.tagName === 'SELECT' || el.type === 'range' ? 'input' : 'input';
+        el.addEventListener(eventType, handleSidebarInput);
+        if (el.type === 'number' || el.type === 'text') {
+          el.addEventListener('keyup', handleSidebarInput);
+        }
+      });
+      document.getElementById('toggleSidebarBtn').addEventListener('click', () => toggleSidebar(true));
+      overlay.addEventListener('click', () => toggleSidebar(false));
+      document.getElementById('saveLocalBtn').addEventListener('click', saveLocal);
+      document.getElementById('loadLocalBtn').addEventListener('click', loadLocal);
+      document.getElementById('resetScenarioBtn').addEventListener('click', () => {
+        scenario = {...defaultScenario};
+        fillSidebar(scenario);
+        calculateAndRender();
+        flashMessage('Scenario reset to sample defaults.');
+      });
+      document.getElementById('exportHtmlBtn').addEventListener('click', () => window.print());
+    }
+
+    function toggleSidebar(open) {
+      sidebar.classList.toggle('open', open);
+      overlay.classList.toggle('show', open);
+    }
+
+    function handleSidebarInput(evt) {
+      const id = evt.target.id;
+      updateScenarioFromSidebar();
+      document.getElementById('sIncomeGrowthOut').textContent = `${Number(scenario.incomeGrowth).toFixed(1)}%`;
+      if (['sDisbursementCohort','sParentPlusHistory','sLoanProgram','sLoanType','sConsolidated'].includes(id)) {
+        flashMessage('Eligibility-affecting change applied. Plan availability may have changed.');
+      }
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(calculateAndRender, 250);
+    }
+
+    function fillSidebar(data) {
+      const map = {
+        sScenarioName: data.scenarioName,
+        sAgi: data.agi,
+        sLoanBalance: data.loanBalance,
+        sIncomeGrowth: data.incomeGrowth,
+        sFamilySize: data.familySize,
+        sRapDependents: data.rapDependents,
+        sFilingStatus: data.filingStatus,
+        sSpouseIncome: data.spouseIncome,
+        sPublicService: data.publicService,
+        sCurrentPlan: data.currentPlan,
+        sLoanProgram: data.loanProgram,
+        sLoanType: data.loanType,
+        sDisbursementCohort: data.disbursementCohort,
+        sConsolidated: data.consolidated,
+        sParentPlusHistory: data.parentPlusHistory,
+        sInterestRate: data.interestRate,
+        sIdrMonths: data.idrMonths,
+        sPslfMonths: data.pslfMonths,
+        sForgivenessTaxRate: data.forgivenessTaxRate,
+        sSpouseDebt: data.spouseDebt
+      };
+      Object.entries(map).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) el.value = value;
+      });
+      document.getElementById('sIncomeGrowthOut').textContent = `${Number(data.incomeGrowth).toFixed(1)}%`;
+    }
+
+    function updateScenarioFromSidebar() {
+      scenario = {
+        scenarioName: getVal('sScenarioName') || defaultScenario.scenarioName,
+        agi: num('sAgi', defaultScenario.agi),
+        loanBalance: num('sLoanBalance', defaultScenario.loanBalance),
+        incomeGrowth: num('sIncomeGrowth', defaultScenario.incomeGrowth),
+        familySize: num('sFamilySize', defaultScenario.familySize),
+        rapDependents: num('sRapDependents', defaultScenario.rapDependents),
+        filingStatus: getVal('sFilingStatus'),
+        spouseIncome: num('sSpouseIncome', defaultScenario.spouseIncome),
+        publicService: getVal('sPublicService'),
+        currentPlan: getVal('sCurrentPlan'),
+        loanProgram: getVal('sLoanProgram'),
+        loanType: getVal('sLoanType'),
+        disbursementCohort: getVal('sDisbursementCohort'),
+        consolidated: getVal('sConsolidated'),
+        parentPlusHistory: getVal('sParentPlusHistory'),
+        interestRate: num('sInterestRate', defaultScenario.interestRate),
+        idrMonths: num('sIdrMonths', defaultScenario.idrMonths),
+        pslfMonths: num('sPslfMonths', defaultScenario.pslfMonths),
+        forgivenessTaxRate: num('sForgivenessTaxRate', defaultScenario.forgivenessTaxRate),
+        spouseDebt: num('sSpouseDebt', defaultScenario.spouseDebt)
+      };
+    }
+
+    function setQuickStart() {
+      showWorkspace();
+      calculateAndRender();
+    }
+
+    function showWorkspace() {
+      workspace.classList.remove('hidden');
+      window.setTimeout(() => workspace.scrollIntoView({behavior: 'smooth', block: 'start'}), 50);
+    }
+
+    function calculateAndRender() {
+      lastResults = calculateScenario(scenario);
+      updatedTimeEl.textContent = new Date().toLocaleTimeString();
+      renderHeader(lastResults);
+      renderSummary(lastResults);
+      renderComparison(lastResults);
+      renderPlanCards(lastResults);
+      drawCharts(lastResults);
+    }
+
+    function calculateScenario(s) {
+      const plans = [
+        simulatePlan('RAP', s),
+        simulatePlan('IBR', s),
+        simulatePlan('TIERED', s),
+        simulatePlan('PAYE', s),
+        simulatePlan('ICR', s),
+        simulatePlan('STANDARD', s)
+      ];
+      const eligible = plans.filter(p => p.eligibility.status === 'eligible');
+      const sortedEligible = [...eligible].sort((a,b) => (a.monthlyNow - b.monthlyNow) || (a.totalPaid - b.totalPaid));
+      const remainingPlans = plans.filter(p => p.eligibility.status !== 'eligible')
+        .sort((a,b) => (a.eligibility.status === 'maybe' ? -1 : 1) - (b.eligibility.status === 'maybe' ? -1 : 1));
+      const cheapestNow = sortedEligible[0] || plans[0];
+      const lowestTotal = [...eligible].sort((a,b) => a.totalPaid - b.totalPaid)[0] || plans[0];
+      const fastest = [...eligible].sort((a,b) => a.years - b.years)[0] || plans[0];
+      const pslfPlan = [...eligible].filter(p => p.pslfFriendly).sort((a,b) => a.totalPaid - b.totalPaid)[0] || null;
+      return { scenario: {...s}, plans, eligible, sortedEligible, remainingPlans, summary: { cheapestNow, lowestTotal, fastest, pslfPlan } };
+    }
+
+    function simulatePlan(plan, s) {
+      const eligibility = getEligibility(plan, s);
+      const rate = s.interestRate / 100 / 12;
+      const yearly = [];
+      let balance = s.loanBalance;
+      let totalPaid = 0;
+      let forgiven = 0;
+      let forgivenessTax = 0;
+      let years = 0;
+      let monthlyNow = 0;
+      let annualNow = 0;
+      let year5Monthly = 0;
+      let waivedInterestTotal = 0;
+      let rapPrincipalCreditTotal = 0;
+      let payoffMonth = null;
+      let forgivenessMonth = null;
+      let income = getCountableIncome(plan, s, 0);
+      const meta = getPlanMeta(plan, s);
+      const maxMonths = meta.maxMonths;
+
+      for (let month = 1; month <= maxMonths; month++) {
+        const yearIndex = Math.ceil(month / 12) - 1;
+        const yearStart = month % 12 === 1;
+        if (yearStart) {
+          income = getCountableIncome(plan, s, yearIndex);
+        }
+
+        let requiredPayment = getMonthlyPayment(plan, s, balance, income, month, meta);
+        if (month === 1) monthlyNow = requiredPayment;
+        if (month === 49) year5Monthly = requiredPayment;
+
+        const interest = balance * rate;
+        let actualPayment = Math.min(requiredPayment, balance + interest);
+        let interestPaid = Math.min(actualPayment, interest);
+        let principalPaid = Math.max(0, actualPayment - interestPaid);
+        let unpaidInterest = Math.max(0, interest - interestPaid);
+        let waivedInterest = 0;
+        let rapPrincipalCredit = 0;
+
+        if (plan === 'RAP' && eligibility.status !== 'no') {
+          waivedInterest = unpaidInterest;
+          unpaidInterest = 0;
+          if (principalPaid < 50 && actualPayment > 0) {
+            rapPrincipalCredit = Math.max(0, Math.min(50, actualPayment) - principalPaid);
+            rapPrincipalCredit = Math.min(rapPrincipalCredit, balance - principalPaid);
+          }
+        }
+
+        // Simplified treatment for other IDR negative amortization in the prototype.
+        if ((plan === 'IBR' || plan === 'PAYE' || plan === 'ICR') && unpaidInterest > 0) {
+          // In this prototype, keep unpaid interest from growing the displayed principal balance.
+          // This preserves a simpler user-facing model and highlights comparative cost.
+          waivedInterest += unpaidInterest * 0.15;
+          unpaidInterest *= 0.85;
+        }
+
+        balance = balance + unpaidInterest - principalPaid - rapPrincipalCredit;
+        balance = Math.max(0, balance);
+
+        totalPaid += actualPayment;
+        waivedInterestTotal += waivedInterest;
+        rapPrincipalCreditTotal += rapPrincipalCredit;
+
+        if (!yearly[yearIndex]) {
+          yearly[yearIndex] = { payments: 0, endBalance: balance, monthlySample: requiredPayment, waivedInterest: 0, rapPrincipalCredit: 0 };
+        }
+        yearly[yearIndex].payments += actualPayment;
+        yearly[yearIndex].endBalance = balance;
+        yearly[yearIndex].monthlySample = requiredPayment;
+        yearly[yearIndex].waivedInterest += waivedInterest;
+        yearly[yearIndex].rapPrincipalCredit += rapPrincipalCredit;
+
+        if (month === 12) annualNow = totalPaid;
+
+        const forgivenAt = meta.forgiveMonths;
+        const effectiveIdrProgress = Math.max(0, Number(s.idrMonths || 0));
+        const effectivePslfProgress = Math.max(0, Number(s.pslfMonths || 0));
+        const countsForPslf = eligibility.pslfEligible && s.publicService === 'yes';
+        const projectedPslfMonth = countsForPslf ? Math.max(0, 120 - effectivePslfProgress) : null;
+        const projectedForgiveMonth = forgivenAt ? Math.max(0, forgivenAt - effectiveIdrProgress) : null;
+
+        if (countsForPslf && projectedPslfMonth !== null && month >= projectedPslfMonth) {
+          forgiven = balance;
+          balance = 0;
+          payoffMonth = month;
+          forgivenessMonth = month;
+          forgivenessTax = 0;
+          break;
+        }
+
+        if (balance <= 0.01) {
+          payoffMonth = month;
+          break;
+        }
+
+        if (projectedForgiveMonth !== null && month >= projectedForgiveMonth) {
+          forgiven = balance;
+          balance = 0;
+          forgivenessMonth = month;
+          payoffMonth = month;
+          forgivenessTax = forgiven * (s.forgivenessTaxRate / 100);
+          break;
+        }
+      }
+
+      years = Math.ceil((payoffMonth || maxMonths) / 12);
+      if (!year5Monthly) year5Monthly = yearly[Math.min(4, yearly.length - 1)]?.monthlySample || monthlyNow;
+      if (!annualNow) annualNow = monthlyNow * 12;
+      const changeText = yearly.length > 1
+        ? `${fmtMoney(yearly[0].monthlySample)} → ${fmtMoney(yearly[Math.min(yearly.length-1, years-1)].monthlySample)}/mo`
+        : `${fmtMoney(monthlyNow)} fixed`;
+
+      return {
+        id: plan,
+        name: planLabel(plan),
+        eligibility,
+        monthlyNow,
+        annualNow,
+        year5Monthly,
+        totalPaid,
+        forgiven,
+        forgivenessTax,
+        years,
+        changeText,
+        yearly,
+        waivedInterestTotal,
+        rapPrincipalCreditTotal,
+        pslfFriendly: eligibility.pslfEligible,
+        notes: getPlanNotes(plan, s, eligibility, waivedInterestTotal, rapPrincipalCreditTotal),
+        benefits: getPlanBenefits(plan, s, eligibility, waivedInterestTotal, rapPrincipalCreditTotal),
+        risks: getPlanRisks(plan, s, eligibility),
+        currentMonthlyTrend: yearly.slice(0, 8).map(y => y?.monthlySample || 0)
+      };
+    }
+
+    function getEligibility(plan, s) {
+      const reasons = [];
+      let status = 'eligible';
+      let label = 'Eligible';
+      let pslfEligible = false;
+      const post2026 = s.disbursementCohort === 'post';
+      const mixed = s.disbursementCohort === 'mixed';
+      const parentPlus = s.loanType === 'PARENT_PLUS' || s.parentPlusHistory === 'yes';
+      const direct = s.loanProgram === 'DIRECT';
+
+      if (plan === 'RAP') {
+        pslfEligible = true;
+        if (!direct) {
+          status = 'no'; label = 'Not eligible'; reasons.push('RAP is a Direct Loan plan.');
+        }
+        if (parentPlus) {
+          status = 'no'; label = 'Not eligible'; reasons.push('Parent PLUS and excepted Parent PLUS consolidations are generally not RAP-eligible.');
+        }
+      }
+      if (plan === 'TIERED') {
+        if (!direct) {
+          status = mixed ? 'maybe' : 'no';
+          label = mixed ? 'Maybe' : 'Not eligible';
+          reasons.push('Tiered Standard is for the post-2026 Direct framework.');
+        }
+      }
+      if (plan === 'IBR') {
+        pslfEligible = true;
+        if (post2026) {
+          status = 'maybe'; label = 'Transitional'; reasons.push('IBR generally applies to pre-July 2026 Direct or qualifying FFEL loans.');
+        }
+        if (s.loanProgram === 'PERKINS') {
+          status = 'no'; label = 'Not eligible'; reasons.push('Perkins loans are not directly placed into IBR without consolidation.');
+        }
+      }
+      if (plan === 'PAYE') {
+        pslfEligible = true;
+        status = 'maybe'; label = 'Grandfathered only';
+        reasons.push('PAYE is tightly grandfathered and not broadly available to new borrowers.');
+        if (post2026) reasons.push('A post-July 2026 Direct Loan usually blocks PAYE eligibility.');
+        if (parentPlus) { status = 'no'; label = 'Not eligible'; reasons.push('Parent PLUS history generally prevents PAYE eligibility.'); }
+      }
+      if (plan === 'ICR') {
+        pslfEligible = true;
+        status = direct ? 'maybe' : 'no';
+        label = direct ? 'Transitional' : 'Not eligible';
+        reasons.push('ICR is mainly relevant in narrow legacy or Parent PLUS transition scenarios.');
+        if (!direct) reasons.push('ICR is a Direct Loan plan, generally after Direct consolidation.');
+      }
+      if (plan === 'STANDARD') {
+        if (s.loanProgram === 'PERKINS') {
+          status = 'maybe'; label = 'School-based'; reasons.push('Perkins repayment is school-based and not the same as Direct Standard Repayment.');
+        }
+      }
+
+      if (mixed && ['RAP','IBR','TIERED'].includes(plan) && status === 'eligible') {
+        status = 'maybe'; label = 'Mixed rules'; reasons.push('Mixed pre- and post-July 2026 borrowing may require loan-by-loan treatment.');
+      }
+
+      return { status, label, reasons, pslfEligible };
+    }
+
+    function getPlanMeta(plan, s) {
+      const balance = s.loanBalance;
+      const preIbrNewBorrower = true; // simplified assumption for the prototype
+      switch (plan) {
+        case 'RAP':
+          return { maxMonths: 360, forgiveMonths: 360 };
+        case 'IBR':
+          return { maxMonths: preIbrNewBorrower ? 240 : 300, forgiveMonths: preIbrNewBorrower ? 240 : 300 };
+        case 'PAYE':
+          return { maxMonths: 240, forgiveMonths: 240 };
+        case 'ICR':
+          return { maxMonths: 300, forgiveMonths: 300 };
+        case 'TIERED': {
+          let months = 120;
+          if (balance >= 100000) months = 300;
+          else if (balance >= 50000) months = 240;
+          else if (balance >= 25000) months = 180;
+          return { maxMonths: months, forgiveMonths: null };
+        }
+        case 'STANDARD':
+        default:
+          return { maxMonths: 120, forgiveMonths: null };
+      }
+    }
+
+    function getCountableIncome(plan, s, yearIndex) {
+      let income = s.agi * Math.pow(1 + s.incomeGrowth / 100, yearIndex);
+      const filingJoint = s.filingStatus === 'mfj';
+      if ((plan === 'RAP' || plan === 'IBR' || plan === 'PAYE' || plan === 'ICR') && filingJoint) {
+        income += s.spouseIncome * Math.pow(1 + s.incomeGrowth / 100, yearIndex);
+      }
+      return income;
+    }
+
+    function getMonthlyPayment(plan, s, balance, income, month, meta) {
+      const poverty = povertyBase + Math.max(0, s.familySize - 1) * povertyAdditional;
+      const directStandard = amortizedPayment(balance, s.interestRate / 100 / 12, 120);
+      if (plan === 'RAP') {
+        let annualBase = 120;
+        if (income > 100000) annualBase = income * 0.10;
+        else if (income > 90000) annualBase = income * 0.09;
+        else if (income > 80000) annualBase = income * 0.08;
+        else if (income > 70000) annualBase = income * 0.07;
+        else if (income > 60000) annualBase = income * 0.06;
+        else if (income > 50000) annualBase = income * 0.05;
+        else if (income > 40000) annualBase = income * 0.04;
+        else if (income > 30000) annualBase = income * 0.03;
+        else if (income > 20000) annualBase = income * 0.02;
+        else if (income > 10000) annualBase = income * 0.01;
+        let monthly = annualBase / 12 - (s.rapDependents * 50);
+        return Math.max(10, monthly);
+      }
+      if (plan === 'IBR') {
+        const disc = Math.max(0, income - poverty * 1.5);
+        const monthly = (disc * 0.10) / 12;
+        return Math.max(0, Math.min(directStandard, monthly < 5 ? 0 : monthly < 10 ? 10 : monthly));
+      }
+      if (plan === 'PAYE') {
+        const disc = Math.max(0, income - poverty * 1.5);
+        const monthly = (disc * 0.10) / 12;
+        return Math.max(0, Math.min(directStandard, monthly < 5 ? 0 : monthly < 10 ? 10 : monthly));
+      }
+      if (plan === 'ICR') {
+        const disc = Math.max(0, income - poverty);
+        const monthlyIncome = (disc * 0.20) / 12;
+        const incomeAdjusted = amortizedPayment(balance, s.interestRate / 100 / 12, 144) * Math.min(1.5, Math.max(0.5, income / 70000));
+        return Math.max(5, Math.min(monthlyIncome, incomeAdjusted));
+      }
+      if (plan === 'TIERED') {
+        return amortizedPayment(balance, s.interestRate / 100 / 12, meta.maxMonths);
+      }
+      return directStandard;
+    }
+
+    function getPlanNotes(plan, s, eligibility, waived, principalCredit) {
+      const notes = [];
+      if (plan === 'RAP') {
+        notes.push('Income-based formula uses AGI brackets and a $50 per dependent monthly adjustment.');
+        notes.push(`Prototype est. waived interest: ${fmtMoney(waived)}.`);
+        notes.push(`Prototype est. RAP principal credit: ${fmtMoney(principalCredit)}.`);
+      }
+      if (plan === 'IBR') notes.push('Payment capped at the 10-year Standard amount in this prototype.');
+      if (plan === 'TIERED') notes.push('Fixed payment schedule. Term changes with balance tier.');
+      if (plan === 'PAYE') notes.push('Shown for comparison only; real availability is tightly grandfathered.');
+      if (plan === 'ICR') notes.push('Prototype uses an estimated income-adjusted version of the 12-year comparison.');
+      if (eligibility.status !== 'eligible') notes.push(eligibility.reasons[0] || 'Eligibility requires deeper loan-level review.');
+      return notes;
+    }
+
+    function getPlanBenefits(plan, s, eligibility, waived, principalCredit) {
+      const benefits = [];
+      if (plan === 'RAP') {
+        benefits.push('Can provide the lowest near-term payment for many borrowers.');
+        benefits.push('Prototype highlights monthly unpaid-interest protection.');
+        benefits.push(`Estimated extra principal support in this scenario: ${fmtMoney(principalCredit)}.`);
+      }
+      if (plan === 'IBR') {
+        benefits.push('IDR path with forgiveness and PSLF compatibility.');
+        benefits.push('Payment cap can limit high-income years.');
+      }
+      if (plan === 'TIERED') {
+        benefits.push('Predictable fixed payment and clear payoff date.');
+        benefits.push('Often faster and simpler than long IDR timelines.');
+      }
+      if (plan === 'PAYE') {
+        benefits.push('If grandfathered, payments can be limited by the Standard cap.');
+        benefits.push('PSLF-compatible if actually eligible.');
+      }
+      if (plan === 'ICR') {
+        benefits.push('Can remain relevant for some Parent PLUS transition cases after consolidation.');
+      }
+      if (plan === 'STANDARD') {
+        benefits.push('Simple fixed 10-year repayment.');
+        benefits.push('Usually the fastest full payoff among ordinary options.');
+      }
+      if (benefits.length === 0) benefits.push('Requires fuller loan-level review to confirm benefits.');
+      return benefits;
+    }
+
+    function getPlanRisks(plan, s, eligibility) {
+      const risks = [];
+      if (plan === 'RAP') {
+        risks.push('AGI threshold cliffs can cause abrupt payment jumps.');
+        risks.push('Forgiveness generally takes a long time unless PSLF applies.');
+      }
+      if (plan === 'IBR') {
+        risks.push('Requires annual recertification and can rise as income rises.');
+        risks.push('Forgiveness tax may matter outside PSLF.');
+      }
+      if (plan === 'TIERED') {
+        risks.push('No IDR forgiveness, interest waiver, or RAP principal support.');
+      }
+      if (plan === 'PAYE') {
+        risks.push('Most borrowers will not actually qualify under current transition rules.');
+      }
+      if (plan === 'ICR') {
+        risks.push('Calculation is complex and often less favorable than IBR or RAP.');
+      }
+      if (plan === 'STANDARD') {
+        risks.push('Highest required payment now for many borrowers.');
+      }
+      if (eligibility.status !== 'eligible') risks.push('Eligibility shown as estimate only; do not rely on this result without detailed rule testing.');
+      return risks;
+    }
+
+    function renderHeader(results) {
+      document.getElementById('scenarioTitle').textContent = results.scenario.scenarioName || 'Scenario results';
+      const pills = document.getElementById('scenarioPills');
+      pills.innerHTML = '';
+      const items = [
+        `${results.scenario.loanProgram} ${loanTypeLabel(results.scenario.loanType)}`,
+        `${fmtMoney(results.scenario.loanBalance)} balance`,
+        `${results.scenario.interestRate.toFixed(2)}% avg rate`,
+        `${results.scenario.agi ? fmtMoney(results.scenario.agi) : '$0'} AGI`,
+        `${results.scenario.familySize} family size`,
+        results.scenario.publicService === 'yes' ? 'Public service on' : 'Public service off'
+      ];
+      items.forEach(text => {
+        const span = document.createElement('span');
+        span.className = 'pill';
+        span.textContent = text;
+        pills.appendChild(span);
+      });
+    }
+
+    function renderSummary(results) {
+      const target = document.getElementById('summaryGrid');
+      target.innerHTML = '';
+      const cards = [
+        {
+          title: 'Lowest payment now',
+          metric: `${results.summary.cheapestNow.name} · ${fmtMoney(results.summary.cheapestNow.monthlyNow)}/mo`,
+          text: `Best near-term cash-flow option in this scenario.`,
+          cls: 'accent-pink'
+        },
+        {
+          title: 'Lowest total paid',
+          metric: `${results.summary.lowestTotal.name} · ${fmtMoney(results.summary.lowestTotal.totalPaid)}`,
+          text: `Fastest low-cost path among currently eligible prototype results.`,
+          cls: 'accent-blue'
+        },
+        {
+          title: 'Fastest payoff / resolution',
+          metric: `${results.summary.fastest.name} · ${results.summary.fastest.years} yrs`,
+          text: `Earliest projected payoff or forgiveness endpoint.`,
+          cls: 'accent-yellow'
+        },
+        {
+          title: 'Best PSLF-compatible path',
+          metric: results.summary.pslfPlan ? `${results.summary.pslfPlan.name} · ${fmtMoney(results.summary.pslfPlan.monthlyNow)}/mo` : 'No clear PSLF path',
+          text: `Shown only when the scenario and plan appear PSLF-compatible.`,
+          cls: 'accent-purple'
+        }
+      ];
+      cards.forEach(card => {
+        const div = document.createElement('div');
+        div.className = `summary-card ${card.cls}`;
+        div.innerHTML = `<div class="headline">${card.title}</div><div class="metric">${card.metric}</div><p>${card.text}</p>`;
+        target.appendChild(div);
+      });
+    }
+
+    function renderComparison(results) {
+      const body = document.getElementById('comparisonBody');
+      const toggle = document.getElementById('toggleAllPlansBtn');
+      body.innerHTML = '';
+      const topThree = (results.sortedEligible || []).slice(0, 3);
+      const visiblePlans = showAllPlans ? [...(results.sortedEligible || []), ...(results.remainingPlans || [])] : topThree;
+      toggle.textContent = showAllPlans ? 'Show top 3' : `Show all plans (${results.plans.length})`;
+      toggle.setAttribute('aria-expanded', String(showAllPlans));
+      visiblePlans.forEach(plan => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <div class="plan-name">${plan.name}</div>
+            <div class="tiny">${plan.eligibility.pslfEligible ? 'PSLF-compatible in concept' : 'Not ordinarily PSLF-oriented'}</div>
+          </td>
+          <td>
+            <span class="eligibility ${eligibilityClass(plan.eligibility.status)}">${plan.eligibility.label}</span>
+            <div class="tiny" style="margin-top:8px;">${escapeHtml(plan.eligibility.reasons.join(' '))}</div>
+          </td>
+          <td><span class="value-strong">${fmtMoney(plan.monthlyNow)}</span></td>
+          <td>${fmtMoney(plan.annualNow)}</td>
+          <td>${fmtMoney(plan.year5Monthly)}</td>
+          <td>${fmtMoney(plan.totalPaid)}</td>
+          <td>${fmtMoney(plan.forgiven)}</td>
+          <td>${fmtMoney(plan.forgivenessTax)}</td>
+          <td>${plan.years} years</td>
+          <td><div class="tiny">${escapeHtml(plan.notes.slice(0, 2).join(' '))}</div></td>
+        `;
+        body.appendChild(tr);
+      });
+      if (!visiblePlans.length) {
+        body.innerHTML = '<tr><td colspan="10">No clearly eligible plans were found from the current inputs. Expand all plans to review transitional or ineligible options.</td></tr>';
+      }
+    }
+
+    function renderPlanCards(results) {
+      const container = document.getElementById('planCards');
+      container.innerHTML = '';
+      const visiblePlans = showAllPlans ? [...(results.sortedEligible || []), ...(results.remainingPlans || [])] : (results.sortedEligible || []).slice(0, 3);
+      visiblePlans.forEach(plan => {
+        const card = document.createElement('article');
+        card.className = `plan-card ${plan.eligibility.status === 'no' ? 'ineligible' : ''}`;
+        const lastYear = plan.yearly[Math.max(0, plan.yearly.length - 1)] || { monthlySample: plan.monthlyNow, endBalance: 0 };
+        card.innerHTML = `
+          <div class="plan-header">
+            <div>
+              <h3>${plan.name}</h3>
+              <div class="tiny">${escapeHtml(plan.eligibility.reasons.join(' '))}</div>
+            </div>
+            <span class="eligibility ${eligibilityClass(plan.eligibility.status)}">${plan.eligibility.label}</span>
+          </div>
+          <div class="subgrid">
+            <div class="metric-block"><div class="label">Monthly now</div><div class="figure">${fmtMoney(plan.monthlyNow)}</div></div>
+            <div class="metric-block"><div class="label">Annual now</div><div class="figure">${fmtMoney(plan.annualNow)}</div></div>
+            <div class="metric-block"><div class="label">Projected total paid</div><div class="figure">${fmtMoney(plan.totalPaid)}</div></div>
+            <div class="metric-block"><div class="label">Timeline</div><div class="figure">${plan.years} years</div></div>
+            <div class="metric-block"><div class="label">Payment path</div><div class="figure">${escapeHtml(plan.changeText)}</div></div>
+            <div class="metric-block"><div class="label">End balance / forgiveness</div><div class="figure">${fmtMoney(lastYear.endBalance)} / ${fmtMoney(plan.forgiven)}</div></div>
+          </div>
+          <div class="subgrid">
+            <div>
+              <h4>Benefits</h4>
+              <ul class="benefits">${plan.benefits.map(b => `<li>${escapeHtml(b)}</li>`).join('')}</ul>
+            </div>
+            <div>
+              <h4>Risks & tradeoffs</h4>
+              <ul class="risks">${plan.risks.map(r => `<li>${escapeHtml(r)}</li>`).join('')}</ul>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function drawCharts(results) {
+      const paymentCanvas = document.getElementById('paymentChart');
+      const balanceCanvas = document.getElementById('balanceChart');
+      const chartPlans = (results.sortedEligible || []).slice(0, 3);
+      const paymentSeries = chartPlans.map(plan => ({
+        label: plan.name,
+        color: colors[plan.id] || '#333',
+        values: plan.yearly.slice(0, 10).map(y => y ? y.payments : 0)
+      }));
+      const balanceSeries = chartPlans.map(plan => ({
+        label: plan.name,
+        color: colors[plan.id] || '#333',
+        values: plan.yearly.slice(0, 10).map(y => y ? y.endBalance : 0)
+      }));
+      drawLineChart(paymentCanvas, paymentSeries, 'Annual payment ($)', 'paymentTooltip', 'Annual payment');
+      drawLineChart(balanceCanvas, balanceSeries, 'Remaining balance ($)', 'balanceTooltip', 'Remaining balance');
+    }
+
+    function drawLineChart(canvas, series, yLabel, tooltipId, metricLabel, hoveredPoint = null) {
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+      const pad = { top: 34, right: 24, bottom: 44, left: 72 };
+      ctx.clearRect(0, 0, width, height);
+
+      const maxLen = Math.max(...series.map(s => s.values.length), 1);
+      let maxVal = Math.max(...series.flatMap(s => s.values), 1);
+      if (!isFinite(maxVal) || maxVal <= 0) maxVal = 1;
+      maxVal *= 1.08;
+      const hitPoints = [];
+
+      // background
+      const bg = ctx.createLinearGradient(0, 0, 0, height);
+      bg.addColorStop(0, 'rgba(255,255,255,0.95)');
+      bg.addColorStop(1, 'rgba(246,249,255,0.75)');
+      ctx.fillStyle = bg;
+      roundRect(ctx, 0, 0, width, height, 20, true, false);
+
+      ctx.strokeStyle = 'rgba(25,42,89,0.08)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = pad.top + ((height - pad.top - pad.bottom) * i / 4);
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(width - pad.right, y);
+        ctx.stroke();
+      }
+      for (let i = 0; i < maxLen; i++) {
+        const x = pad.left + ((width - pad.left - pad.right) * (maxLen === 1 ? 0 : i / (maxLen - 1)));
+        ctx.beginPath();
+        ctx.moveTo(x, pad.top);
+        ctx.lineTo(x, height - pad.bottom);
+        ctx.strokeStyle = 'rgba(25,42,89,0.04)';
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#171b24';
+      ctx.font = '12px Inter, system-ui, sans-serif';
+      ctx.textAlign = 'right';
+      for (let i = 0; i <= 4; i++) {
+        const val = maxVal - (maxVal * i / 4);
+        const y = pad.top + ((height - pad.top - pad.bottom) * i / 4) + 4;
+        ctx.fillText(shortMoney(val), pad.left - 8, y);
+      }
+      ctx.textAlign = 'center';
+      for (let i = 0; i < maxLen; i++) {
+        const x = pad.left + ((width - pad.left - pad.right) * (maxLen === 1 ? 0 : i / (maxLen - 1)));
+        ctx.fillText(`Y${i+1}`, x, height - 14);
+      }
+      ctx.save();
+      ctx.translate(16, height / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#171b24';
+      ctx.fillText(yLabel, 0, 0);
+      ctx.restore();
+
+      series.forEach((s, seriesIndex) => {
+        const isDimmed = hoveredPoint && hoveredPoint.seriesIndex !== seriesIndex;
+        ctx.save();
+        ctx.globalAlpha = isDimmed ? 0.18 : 1;
+        ctx.beginPath();
+        s.values.forEach((v, i) => {
+          const x = pad.left + ((width - pad.left - pad.right) * (maxLen === 1 ? 0 : i / (maxLen - 1)));
+          const y = height - pad.bottom - ((height - pad.top - pad.bottom) * (v / maxVal));
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.lineWidth = hoveredPoint && hoveredPoint.seriesIndex === seriesIndex ? 5 : 3;
+        ctx.strokeStyle = s.color;
+        ctx.stroke();
+
+        s.values.forEach((v, i) => {
+          const x = pad.left + ((width - pad.left - pad.right) * (maxLen === 1 ? 0 : i / (maxLen - 1)));
+          const y = height - pad.bottom - ((height - pad.top - pad.bottom) * (v / maxVal));
+          const active = hoveredPoint && hoveredPoint.seriesIndex === seriesIndex && hoveredPoint.pointIndex === i;
+          hitPoints.push({x, y, value: v, year: i + 1, label: s.label, color: s.color, seriesIndex, pointIndex: i});
+          ctx.beginPath();
+          ctx.arc(x, y, active ? 7 : 4.5, 0, Math.PI * 2);
+          ctx.fillStyle = s.color;
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(255,255,255,0.98)';
+          ctx.lineWidth = active ? 3 : 1.5;
+          ctx.stroke();
+        });
+        ctx.restore();
+      });
+
+      // legend
+      let lx = pad.left;
+      const ly = 12;
+      ctx.textAlign = 'left';
+      ctx.font = '12px Inter, system-ui, sans-serif';
+      series.forEach(s => {
+        ctx.fillStyle = s.color;
+        ctx.fillRect(lx, ly, 12, 12);
+        ctx.fillStyle = '#111318';
+        ctx.fillText(s.label, lx + 18, ly + 10);
+        lx += 18 + ctx.measureText(s.label).width + 18;
+      });
+
+      chartHitMaps.set(canvas.id, { hitPoints, series, yLabel, tooltipId, metricLabel });
+      if (!canvas.dataset.interactiveBound) {
+        canvas.dataset.interactiveBound = 'true';
+        const handle = (evt) => {
+          const rect = canvas.getBoundingClientRect();
+          const scaleX = canvas.width / rect.width;
+          const scaleY = canvas.height / rect.height;
+          const x = (evt.clientX - rect.left) * scaleX;
+          const y = (evt.clientY - rect.top) * scaleY;
+          const map = chartHitMaps.get(canvas.id);
+          if (!map) return;
+          let best = null;
+          let bestDist = Infinity;
+          map.hitPoints.forEach(p => {
+            const d = Math.hypot(p.x - x, p.y - y);
+            if (d < bestDist) { best = p; bestDist = d; }
+          });
+          const tip = document.getElementById(map.tooltipId);
+          if (best && bestDist <= 18) {
+            tip.innerHTML = `<strong>${best.label}</strong><br>${map.metricLabel}, Year ${best.year}: <strong>${fmtMoney(best.value)}</strong>`;
+            tip.style.left = `${(best.x / canvas.width) * 100}%`;
+            tip.style.top = `${(best.y / canvas.height) * 100}%`;
+            tip.classList.add('show');
+            drawLineChart(canvas, map.series, map.yLabel, map.tooltipId, map.metricLabel, best);
+          } else {
+            tip.classList.remove('show');
+            drawLineChart(canvas, map.series, map.yLabel, map.tooltipId, map.metricLabel, null);
+          }
+        };
+        canvas.addEventListener('mousemove', handle);
+        canvas.addEventListener('mouseleave', () => {
+          const map = chartHitMaps.get(canvas.id);
+          if (!map) return;
+          document.getElementById(map.tooltipId).classList.remove('show');
+          drawLineChart(canvas, map.series, map.yLabel, map.tooltipId, map.metricLabel, null);
+        });
+        canvas.addEventListener('click', handle);
+      }
+    }
+
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+      if (typeof radius === 'number') radius = {tl: radius, tr: radius, br: radius, bl: radius};
+      ctx.beginPath();
+      ctx.moveTo(x + radius.tl, y);
+      ctx.lineTo(x + width - radius.tr, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+      ctx.lineTo(x + width, y + height - radius.br);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+      ctx.lineTo(x + radius.bl, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+      ctx.lineTo(x, y + radius.tl);
+      ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    function amortizedPayment(principal, monthlyRate, months) {
+      if (principal <= 0) return 0;
+      if (monthlyRate <= 0) return principal / months;
+      const factor = Math.pow(1 + monthlyRate, months);
+      return principal * monthlyRate * factor / (factor - 1);
+    }
+
+    function planLabel(plan) {
+      return ({RAP:'RAP', IBR:'IBR', TIERED:'Tiered Standard', PAYE:'PAYE', ICR:'ICR', STANDARD:'Standard Repayment'})[plan] || plan;
+    }
+
+    function loanTypeLabel(type) {
+      return ({UNDERGRAD:'Undergrad', GRAD_PLUS:'Grad PLUS', PARENT_PLUS:'Parent PLUS', CONSOLIDATION:'Consolidation'})[type] || type;
+    }
+
+    function eligibilityClass(status) {
+      return status === 'eligible' ? 'eligible' : status === 'maybe' ? 'maybe' : 'no';
+    }
+
+    function fmtMoney(val) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Number(val || 0));
+    }
+
+    function shortMoney(val) {
+      const n = Number(val || 0);
+      if (n >= 1000000) return `$${(n/1000000).toFixed(1)}M`;
+      if (n >= 1000) return `$${Math.round(n/1000)}k`;
+      return `$${Math.round(n)}`;
+    }
+
+    function getVal(id) { return document.getElementById(id).value; }
+    function num(id, fallback=0) {
+      const val = Number(document.getElementById(id).value);
+      return Number.isFinite(val) ? val : fallback;
+    }
+
+    function saveLocal() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(scenario));
+      flashMessage('Scenario saved to your browser.');
+    }
+
+    function loadLocal() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        flashMessage('No saved scenario found in this browser.');
+        return;
+      }
+      try {
+        scenario = JSON.parse(raw);
+        fillSidebar(scenario);
+        fillWizard(scenario);
+        calculateAndRender();
+        flashMessage('Loaded saved scenario from your browser.');
+      } catch {
+        flashMessage('Could not read the saved scenario.');
+      }
+    }
+
+    function exportScenarioJson() {
+      const blob = new Blob([JSON.stringify(scenario, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'student-loan-scenario.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function flashMessage(message) {
+      flash.textContent = message;
+      flash.classList.add('show');
+      clearTimeout(flash._timer);
+      flash._timer = setTimeout(() => flash.classList.remove('show'), 2500);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/[&<>"]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
+    }
+
+    init();
+  </script>
+</body>
+</html>
